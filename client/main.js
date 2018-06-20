@@ -34,16 +34,63 @@ var my_combos = listener.register_many([
 ]); 
 Template.myTacos.helpers({
   likedTacos(){
-    debugger;
     return TacoUsers.find({id : Meteor.userId()}).fetch()[0].likedTacos 
   }
 })
-
+Template.myTacos.events({
+  'click .tacoButton': function(event){
+    Session.set('tacoRecipe',event.currentTarget.id)
+    console.log(event.currentTarget.id)
+}
+})
 Template.tacoRecipe.helpers({
-  recipe(){
-    // stahp 
+  title(){
+    return "TITLE"
+    //http://taco-randomizer.herokuapp.com//random/'
+  },
+  base(){ 
+    debugger;
+
+    var x = Session.get('tacoRecipe')
+    var s = x.split("+");
+    var sCompare = ['base_layer','condiment','mixin','seasoning','shell']
+    console.log(s)
+    // var base = x.substring(0,x.indexOf('+'));
+    // x = x.substring(x.indexOf('+') + 1);
+    // var condiment = x.substring(0,x.indexOf('+'))
+    // x = x.substring(x.indexOf('+') + 1);
+    
+    var tacosToCheck = TacoUsers.find({id : Meteor.userId()}).fetch()[0].likedTacos
+    for(var i = 0; i < tacosToCheck.length; i++){
+      if(s[0] == tacosToCheck[i][sCompare[0]].slug
+      && s[1] == tacosToCheck[i][sCompare[1]].slug
+      && s[2] == tacosToCheck[i][sCompare[2]].slug
+      && s[3] == tacosToCheck[i][sCompare[3]].slug
+      && s[4] == tacosToCheck[i][sCompare[4]].slug){
+        event.preventDefault();
+        //calls the server side get request, deal with CORS request
+        Meteor.call('getData', tacosToCheck[i][sCompare[0]].url, function(err,response) {
+            if(err) {  
+                Session.set('isError', true);  // do you need to display the help form for a wrong submit                                
+                Session.set('serverDataResponse', "Error:" + err.reason); 
+                return;
+            }
+            if(typeof Session.get('selectedCondition') !== 'undefined'){
+                // if there have already been conditions submitted add this condition to the list 
+                Session.set('isError', false);                                                
+                console.log("foo")                 
+            } else {
+               // no condition has been submitted, start a list  
+               console.log("foo")                
+            }
+        });
+      }
+    }
   }
 })
+function turnStringIntoSeperate(){
+
+}
 
 Template.recipe.helpers({
   base() {
@@ -79,6 +126,21 @@ function getData(){
   request.send();
   return x; 
 }
+function getDataForRecipea(urlWithContent){
+      // jQuery async request
+      $.ajax(
+      {
+          url: urlWithContent,
+          dataType: "html",
+          success: function(data) {
+                                      return $('.result').html(data);
+                                  },
+          error: function(e) 
+          {
+              alert('Error: ' + e);
+          }
+      });
+}
 function addLikedTaco(tacoToAdd){
   var tacos = TacoUsers.find({id : Meteor.userId()}).fetch(); 
   if(tacos.length == 0){
@@ -92,7 +154,8 @@ function addLikedTaco(tacoToAdd){
     TacoUsers.update(tacos[0]._id, { $set: { likedTacos: arrToAdd } });        
   }
 }
-Router.go('/')
+
+Router.go('/main')
 Router.route('/', {
   template: 'main'
 });

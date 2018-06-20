@@ -29,3 +29,4 @@ alanning:roles
 accounts-ui
 accounts-password
 iron:router
+jquery

@@ -9,17 +9,21 @@
 <template name="main">
 </template>
 <template name="myTacos">
-    <div class="card center" style="width: 65rem;">
+    <div class="card center" style="width: 63rem;">
       <ul class="list-group list-group-flush">
         {{#each likedTacos}}
-          <button id="{{this}}" class="tacoButton"><li class="list-group-item">{{this.condiment.name}} | {{this.base_layer.name}}</li></button>
+          <button id='{{this.base_layer.slug}}+{{this.condiment.slug}}+{{this.mixin.slug}}+{{this.seasoning.slug}}+{{this.shell.slug}}' class="tacoButton">
+            <li class="list-group-item">{{this.base_layer.name}} • {{this.condiment.name}} •  {{this.mixin.name}} • {{this.seasoning.name}} • {{this.shell.name}}</li>
+          </button>
         {{/each}}
       </ul>
     </div>
+    {{>tacoRecipe}}
 </template>
 
 <template name="tacoRecipe">
-  {{recipe}}
+  {{title}}
+  {{base}}
 </template>
 
 <template name="recipe">
@@ -58,7 +62,7 @@
               <a class="nav-link js-scroll-trigger" href="{{pathFor route='myTacos'}}">my tacos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="">  {{> loginButtons}} </a>
+              <a class="nav-link js-scroll-trigger">  {{> loginButtons}} </a>
             </li>
           </ul>
         </div>
